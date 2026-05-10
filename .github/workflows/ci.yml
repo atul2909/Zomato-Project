@@ -41,62 +41,15 @@ jobs:
       - name: Run Tests
         run: echo "my test case is passed."
 
-      #  OWASP Dependency Check (SCA)
-     # - name: Run OWASP Dependency Check
-       # uses: dependency-check/Dependency-Check_Action@main
-     #   with:
-       #   project: "zomato-app"
-        #  path: "."
-         # format: "SARIF"
-          #out: "reports"
-        #  args: >
-        #   --enableRetired
-        #   --enableExperimental
-         #   --failOnCVSS 7 */
-
-     # - name: Upload OWASP Report to GitHub Security
-     #  uses: github/codeql-action/upload-sarif@v3
-     #  with:
-    #     sarif_file: reports/dependency-check-report.sarif
-
       #  Build Docker Image
       - name: Build Docker Image
         run: docker build -t $IMAGE_NAME:${{ github.sha }} .
 
-      - name: Tag Image
-        run: docker tag $IMAGE_NAME:${{ github.sha }} $IMAGE_NAME:latest
-
-      #  Install Trivy (Pinned version)
-      # ...
-      # ...
-      - name: Install Trivy
-        uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241
-
       
-      #  Scan Filesystem
-      - name: Run Trivy FS Scan
-        uses: aquasecurity/trivy-action@v0.20.0
-        with:
-          scan-type: 'fs'
-          severity: 'CRITICAL,HIGH'
-          format: 'sarif'
-          output: 'trivy-fs.sarif'
-
       #  Scan Docker Image
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: '$IMAGE_NAME:${{ github.sha }}'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy Results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-image.sarif
 
       #  Login Securely
       - name: Login to DockerHub
